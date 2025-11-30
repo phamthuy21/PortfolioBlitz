@@ -1,0 +1,114 @@
+Build a complete personal portfolio website as a full-stack project with dark mode support and professional animations.
+
+TECH STACK:
+- Frontend: React + Vite
+- Styling: TailwindCSS
+- Animations: Framer Motion
+- Dark mode: TailwindCSS dark mode + theme toggle button
+- Backend: Node.js + Express
+- Data storage: messages.json for contact form messages
+
+FULL REQUIREMENTS:
+
+1. GLOBAL UI DESIGN
+   - Modern, elegant design using Tailwind
+   - Full support for light/dark mode using class strategy
+   - Provide a floating dark-mode toggle button (top-right)
+   - Smooth transitions when switching themes
+
+2. HOMEPAGE (Hero Section)
+   - Name: "Thuy Pham"
+   - Title: "Full Stack Developer"
+   - Subtitle with typewriter animation (Framer Motion)
+   - Gradient background + animated floating elements
+   - Call-to-action buttons: "Download CV" and "Contact Me"
+   - Hero image or avatar with subtle scale animation
+
+3. ABOUT ME SECTION
+   - Image on the left, text on the right (reverse order on mobile)
+   - Skills grid with hover animations
+   - Each skill uses icon + name + fade-in animation
+
+4. PROJECTS SECTION
+   - 6 projects
+   - Each project card includes: image, title, description, tech stack, GitHub link
+   - Card hover effects: lift + shadow glow + subtle rotate
+   - Fade-in + stagger animation for cards
+
+5. CONTACT SECTION
+   - Form fields: name, email, message
+   - Submit via POST /api/contact
+   - Backend validates inputs and saves messages to messages.json
+   - Show toast notifications (success/error)
+   - Animate the contact section and inputs
+
+6. NAVBAR
+   - Sticky top
+   - Responsive mobile sidebar
+   - Smooth scrolling
+   - Dark mode-compatible
+
+7. FOOTER
+   - Social links: GitHub + LinkedIn (icons)
+   - Dark mode compatible
+   - Fade-in animation on scroll
+
+8. BACKEND REQUIREMENTS
+   - Folder: /server
+   - File: server.js (Express)
+   - Endpoint: POST /api/contact
+   - Validate input, append message to messages.json
+   - Return JSON response
+   - Include CORS & bodyParser
+
+9. FRONTEND FOLDER STRUCTURE
+   /client
+     /src
+       /components
+         Navbar.jsx
+         DarkModeToggle.jsx
+         ProjectCard.jsx
+         SkillCard.jsx
+       /sections
+         Hero.jsx
+         About.jsx
+         Projects.jsx
+         Contact.jsx
+       /utils
+         theme.js
+       App.jsx
+       main.jsx
+       index.css
+
+10. ANIMATIONS – REQUIRED
+    - Use Framer Motion:
+        * Fade in
+        * Stagger children
+        * Scale on hover
+        * Smooth transitions
+        * Parallax subtle movement in hero
+    - Add transition durations between 0.4s – 1s
+
+11. DARK MODE – REQUIRED
+    - Tailwind dark mode config: "class"
+    - Dark mode palette:
+        background: #0f0f0f
+        text: #e5e5e5
+        card: #1a1a1a
+    - Light mode palette:
+        background: #ffffff
+        text: #222222
+        card: #f3f3f3
+
+12. DELIVERABLES
+    - Complete file structure
+    - All component source code
+    - Backend code
+    - Working dark mode toggle
+    - Working animated UI
+    - Ready to run on Replit:
+         npm install
+         npm run dev  (frontend)
+         node server/server.js (backend)
+
+Start by generating the full project structure and then provide the complete source code.
