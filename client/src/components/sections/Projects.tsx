@@ -1,5 +1,5 @@
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { Github, ExternalLink, Code2, ShoppingCart, CheckSquare, Brain, Building2, Heart, Share2 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,13 @@ import type { Project } from "@shared/schema";
 
 const projectIcons = [ShoppingCart, CheckSquare, Brain, Building2, Heart, Share2];
 
-const projects: Project[] = [
+type ProjectCategory = "all" | "frontend" | "backend" | "fullstack" | "mobile";
+
+interface ExtendedProject extends Project {
+  category: ProjectCategory;
+}
+
+const projects: ExtendedProject[] = [
   {
     id: 1,
     title: "E-Commerce Platform",
@@ -18,6 +24,7 @@ const projects: Project[] = [
     techStack: ["React", "Node.js", "PostgreSQL", "Stripe"],
     githubUrl: "https://github.com",
     liveUrl: "https://example.com",
+    category: "fullstack",
   },
   {
     id: 2,
@@ -28,6 +35,7 @@ const projects: Project[] = [
     techStack: ["Next.js", "TypeScript", "MongoDB", "Socket.io"],
     githubUrl: "https://github.com",
     liveUrl: "https://example.com",
+    category: "fullstack",
   },
   {
     id: 3,
@@ -37,6 +45,7 @@ const projects: Project[] = [
     image: "",
     techStack: ["React", "Python", "OpenAI", "FastAPI"],
     githubUrl: "https://github.com",
+    category: "backend",
   },
   {
     id: 4,
@@ -47,6 +56,7 @@ const projects: Project[] = [
     techStack: ["React", "Node.js", "PostgreSQL", "MapBox"],
     githubUrl: "https://github.com",
     liveUrl: "https://example.com",
+    category: "fullstack",
   },
   {
     id: 5,
@@ -56,6 +66,7 @@ const projects: Project[] = [
     image: "",
     techStack: ["React Native", "Node.js", "MongoDB", "Charts.js"],
     githubUrl: "https://github.com",
+    category: "mobile",
   },
   {
     id: 6,
@@ -66,33 +77,58 @@ const projects: Project[] = [
     techStack: ["Vue.js", "Python", "Redis", "GraphQL"],
     githubUrl: "https://github.com",
     liveUrl: "https://example.com",
+    category: "frontend",
   },
 ];
+
+const categories: { value: ProjectCategory; label: string }[] = [
+  { value: "all", label: "All Projects" },
+  { value: "fullstack", label: "Full Stack" },
+  { value: "frontend", label: "Frontend" },
+  { value: "backend", label: "Backend" },
+  { value: "mobile", label: "Mobile" },
+];
+
+const allTechStacks = Array.from(
+  new Set(projects.flatMap((p) => p.techStack))
+).sort();
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
+      staggerChildren: 0.1,
     },
   },
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: "easeOut" },
+    scale: 1,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    transition: { duration: 0.2 },
   },
 };
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const IconComponent = projectIcons[index] || Code2;
-  
+function ProjectCard({ project, index }: { project: ExtendedProject; index: number }) {
+  const IconComponent = projectIcons[index % projectIcons.length] || Code2;
+
   return (
-    <motion.div variants={cardVariants}>
+    <motion.div
+      layout
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
       <Card
         className="group overflow-visible h-full flex flex-col hover-elevate transition-all duration-300"
         data-testid={`card-project-${project.id}`}
@@ -167,6 +203,24 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 export function Projects() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>("all");
+  const [selectedTech, setSelectedTech] = useState<string | null>(null);
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) => {
+      const categoryMatch = selectedCategory === "all" || project.category === selectedCategory;
+      const techMatch = !selectedTech || project.techStack.includes(selectedTech);
+      return categoryMatch && techMatch;
+    });
+  }, [selectedCategory, selectedTech]);
+
+  const handleCategoryChange = (category: ProjectCategory) => {
+    setSelectedCategory(category);
+  };
+
+  const handleTechChange = (tech: string | null) => {
+    setSelectedTech(tech);
+  };
 
   return (
     <section id="projects" className="py-20 lg:py-32 bg-card/50" ref={ref} data-testid="section-projects">
@@ -175,7 +229,7 @@ export function Projects() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2
             className="text-3xl sm:text-4xl font-bold mb-4"
@@ -190,15 +244,100 @@ export function Projects() {
         </motion.div>
 
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          data-testid="grid-projects"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-10 space-y-4"
         >
-          {projects.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
-          ))}
+          <div className="flex flex-wrap justify-center gap-2" data-testid="filter-categories">
+            {categories.map((category) => (
+              <Button
+                key={category.value}
+                size="sm"
+                variant={selectedCategory === category.value ? "default" : "outline"}
+                onClick={() => handleCategoryChange(category.value)}
+                className="transition-all duration-200"
+                data-testid={`button-filter-${category.value}`}
+              >
+                {category.label}
+              </Button>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-2" data-testid="filter-tech-stack">
+            <Badge
+              variant={selectedTech === null ? "default" : "outline"}
+              className="cursor-pointer transition-all duration-200"
+              onClick={() => handleTechChange(null)}
+              data-testid="badge-filter-all-tech"
+            >
+              All Tech
+            </Badge>
+            {allTechStacks.map((tech) => (
+              <Badge
+                key={tech}
+                variant={selectedTech === tech ? "default" : "outline"}
+                className="cursor-pointer transition-all duration-200"
+                onClick={() => handleTechChange(tech)}
+                data-testid={`badge-filter-${tech.toLowerCase().replace(/\./g, "").replace(/\s/g, "-")}`}
+              >
+                {tech}
+              </Badge>
+            ))}
+          </div>
+        </motion.div>
+
+        <AnimatePresence mode="popLayout">
+          {filteredProjects.length > 0 ? (
+            <motion.div
+              layout
+              variants={containerVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              data-testid="grid-projects"
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredProjects.map((project, index) => (
+                  <ProjectCard key={project.id} project={project} index={index} />
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="text-center py-16"
+              data-testid="text-no-projects"
+            >
+              <p className="text-muted-foreground text-lg">
+                No projects match the selected filters.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  setSelectedCategory("all");
+                  setSelectedTech(null);
+                }}
+                data-testid="button-clear-filters"
+              >
+                Clear Filters
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="text-center mt-8 text-sm text-muted-foreground"
+          data-testid="text-filter-count"
+        >
+          Showing {filteredProjects.length} of {projects.length} projects
         </motion.div>
       </div>
     </section>
