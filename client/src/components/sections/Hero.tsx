@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Download, Mail, ChevronDown, User } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
 const subtitles = [
@@ -172,14 +173,15 @@ export function Hero() {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="flex flex-wrap gap-4 justify-center lg:justify-start"
             >
-              <Button
-                size="lg"
-                onClick={() => window.open("#", "_blank")}
-                data-testid="button-download-cv"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Download CV
-              </Button>
+              <Link href="/resume">
+                <Button
+                  size="lg"
+                  data-testid="button-download-cv"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download CV
+                </Button>
+              </Link>
               <Button
                 size="lg"
                 variant="outline"

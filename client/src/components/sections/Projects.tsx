@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { Github, ExternalLink, Code2, ShoppingCart, CheckSquare, Brain, Building2, Heart, Share2 } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -104,17 +104,11 @@ const containerVariants = {
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: { duration: 0.4, ease: "easeOut" },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    transition: { duration: 0.2 },
   },
 };
 
@@ -122,27 +116,17 @@ function ProjectCard({ project, index }: { project: ExtendedProject; index: numb
   const IconComponent = projectIcons[index % projectIcons.length] || Code2;
 
   return (
-    <motion.div
-      layout
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-    >
+    <motion.div variants={cardVariants}>
       <Card
         className="group overflow-visible h-full flex flex-col hover-elevate transition-all duration-300"
         data-testid={`card-project-${project.id}`}
       >
         <CardHeader className="p-0">
           <div className="relative h-48 overflow-hidden rounded-t-md bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
-            <motion.div
-              className="flex flex-col items-center justify-center gap-2"
-              whileHover={{ scale: 1.1, rotate: 2 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
+            <div className="flex flex-col items-center justify-center gap-2 transition-transform duration-300 group-hover:scale-110">
               <IconComponent className="w-12 h-12 text-primary/50" />
               <span className="text-xl font-bold text-primary/40">{project.title.charAt(0)}</span>
-            </motion.div>
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         </CardHeader>
@@ -287,48 +271,43 @@ export function Projects() {
           </div>
         </motion.div>
 
-        <AnimatePresence mode="popLayout">
-          {filteredProjects.length > 0 ? (
-            <motion.div
-              layout
-              variants={containerVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              data-testid="grid-projects"
+        {filteredProjects.length > 0 ? (
+          <motion.div
+            key={`${selectedCategory}-${selectedTech}`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            data-testid="grid-projects"
+          >
+            {filteredProjects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-16"
+            data-testid="text-no-projects"
+          >
+            <p className="text-muted-foreground text-lg">
+              No projects match the selected filters.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-4"
+              onClick={() => {
+                setSelectedCategory("all");
+                setSelectedTech(null);
+              }}
+              data-testid="button-clear-filters"
             >
-              <AnimatePresence mode="popLayout">
-                {filteredProjects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} index={index} />
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="text-center py-16"
-              data-testid="text-no-projects"
-            >
-              <p className="text-muted-foreground text-lg">
-                No projects match the selected filters.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4"
-                onClick={() => {
-                  setSelectedCategory("all");
-                  setSelectedTech(null);
-                }}
-                data-testid="button-clear-filters"
-              >
-                Clear Filters
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              Clear Filters
+            </Button>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}
