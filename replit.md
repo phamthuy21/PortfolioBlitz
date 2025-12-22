@@ -2,7 +2,40 @@
 
 ## Overview
 
-This is a modern, full-stack personal portfolio website for Thuy Pham, a Full Stack Developer. The application features a single-page design with smooth animations, dark/light mode theming, and a contact form for visitor engagement. Built with React and Express, it showcases professional projects, technical skills, and provides multiple ways to connect.
+Modern, full-stack personal portfolio website for Thuy Pham with dark/light mode, animations, contact form, blog system, admin dashboard with comprehensive CRUD management, analytics tracking, and resume download functionality.
+
+## Recent Updates (Phase 2 - Completed)
+
+### Admin Content Management System
+Added comprehensive admin dashboard for managing all dynamic portfolio content:
+- **Home Content**: Edit hero section heading, subheading, and CTA text
+- **About Content**: Edit about section title and description
+- **Skills Management**: Create, read, update, delete technical skills with proficiency levels
+- **Projects Management**: Create, read, update, delete portfolio projects with categories
+- **Certificates Management**: Create, read, update, delete professional certificates
+
+### Database Schema Additions
+New PostgreSQL tables added via Drizzle ORM:
+- `home_content`: Hero section content management
+- `about_content`: About section content management
+- `skills`: Technical skills with proficiency ratings
+- `projects`: Portfolio projects (migrated from static data)
+- `certificates`: Professional certifications and achievements
+
+### API Endpoints Added
+All CRUD endpoints protected with admin authentication:
+- `GET/PUT /api/admin/home` - Home content management
+- `GET/PUT /api/admin/about` - About content management
+- `GET/POST/PATCH/DELETE /api/admin/skills/:id` - Skills management
+- `GET/POST/PATCH/DELETE /api/admin/projects/:id` - Projects management
+- `GET/POST/PATCH/DELETE /api/admin/certificates/:id` - Certificates management
+
+### Admin UI Components
+- Tabbed interface for managing 5 content sections
+- Form components for creating/editing content
+- List views with delete functionality
+- Loading states and toast notifications for user feedback
+- Fully responsive design
 
 ## User Preferences
 
@@ -20,126 +53,103 @@ Preferred communication style: Simple, everyday language.
 **UI Component System**
 - **shadcn/ui** component library built on **Radix UI** primitives
 - Customized "new-york" style variant with neutral color palette
-- All UI components are TypeScript-based and located in `client/src/components/ui/`
-- Component aliases configured via path mapping for clean imports (`@/components`, `@/lib`, etc.)
+- Component aliases configured via path mapping (`@/components`, `@/lib`, etc.)
 
-**Styling Approach**
+**Styling & Animation**
 - **TailwindCSS** for utility-first styling with custom design tokens
-- CSS variables for theme values (HSL color format)
-- Dark/light mode support via CSS class strategy (`.dark` class on root element)
-- Custom color system defined in `client/src/index.css` with semantic color naming
-- Responsive design with mobile-first approach
-
-**Animation System**
-- **Framer Motion** for declarative animations and transitions
-- Scroll-triggered animations using `useInView` hook
-- Typewriter effect for hero subtitle rotation
-- Staggered animations for project cards and skill items
-- Hover and active state animations throughout
+- **Framer Motion** for declarative animations
+- Dark/light mode support via CSS class strategy
+- Custom color system with HSL variables
 
 **State Management**
-- **React Query (@tanstack/react-query)** for server state management
-- Local component state with React hooks
-- Theme state managed via Context API (`ThemeProvider`)
-- Form state handled by **React Hook Form** with **Zod** validation
+- **React Query** for server state management
+- React hooks for local component state
+- Theme state via Context API
+- Form state with React Hook Form + Zod validation
 
-**Page Structure**
-The application consists of a single home page with distinct sections:
-- **Hero Section**: Animated introduction with typewriter effect and CTAs
-- **About Section**: Two-column layout featuring skills grid with icon-based cards
-- **Projects Section**: Grid of 6 project cards with hover effects and tech stack badges
-- **Contact Section**: Form with validation for visitor messages
-- **Footer**: Social links and copyright information
-- **Navbar**: Sticky navigation with mobile sidebar, smooth scrolling to sections
+**Key Pages**
+- Home page with hero, about, projects, contact, footer sections
+- Blog system with list and detail pages
+- Admin dashboard for contacts and blog management
+- Admin content dashboard for CRUD operations on portfolio content
+- Resume/CV page with print-to-PDF functionality
 
 ### Backend Architecture
 
 **Server Framework**
-- **Express.js** running on Node.js
-- Custom HTTP server using Node's `http.createServer()`
-- Development mode uses Vite middleware for HMR (Hot Module Replacement)
-- Production mode serves pre-built static files
+- **Express.js** running on Node.js with Vite middleware in dev mode
+- RESTful API under `/api` prefix
+- Admin endpoints protected with Bearer token authentication
 
-**API Design**
-- RESTful API endpoints under `/api` prefix
-- **POST /api/contact**: Accepts contact form submissions with validation
-- **GET /api/messages**: Retrieves all stored contact messages
-- JSON-based request/response format
-- Centralized error handling with proper HTTP status codes
+**Database Layer**
+- **PostgreSQL** via Neon serverless (using `@neondatabase/serverless`)
+- **Drizzle ORM** for type-safe database interactions
+- Automatic migrations via `npm run db:push`
 
-**Request Processing**
-- Body parsing via `express.json()` with raw body preservation
-- URL-encoded data support for form submissions
-- Request logging middleware tracking method, path, status, and duration
+**API Routes**
+- Contact form submission and management
+- Blog post CRUD operations
+- Admin content management (home, about, skills, projects, certificates)
+- Analytics event tracking
+- Admin authentication
 
-**Validation Layer**
-- **Zod** schemas for runtime type validation
-- Validation happens at the API route level before storage
-- User-friendly error messages using `zod-validation-error`
-- Schema defined in shared directory for client/server consistency
+### Current Tables
+- `users` - Admin accounts (prepared for future use)
+- `contact_messages` - Visitor contact form submissions
+- `blog_posts` - Blog post content with markdown support
+- `analytics_events` - Page view and section engagement tracking
+- `home_content` - Hero section content
+- `about_content` - About section content
+- `skills` - Technical skills inventory
+- `projects` - Portfolio projects
+- `certificates` - Professional certifications
 
-**Development Tooling**
-- Custom Vite integration for seamless development experience
-- Hot module reloading for both frontend and backend changes
-- Replit-specific plugins for error overlays and development banners
-- Build script uses esbuild for server bundling
+### Storage & Validation
+- **Zod** schemas for runtime validation
+- Type-safe database operations with Drizzle ORM
+- Centralized validation layer at API routes
 
-### Data Storage Solutions
+## Feature Checklist
 
-**Current Implementation: File-Based Storage**
-- Contact messages stored in `messages.json` at project root
-- In-memory storage class (`MemStorage`) with file persistence
-- Synchronous file I/O operations using Node's `fs` module
-- Each message includes: id (UUID), name, email, message, createdAt timestamp
+✅ Dark/light mode theming
+✅ Framer Motion animations
+✅ Responsive design
+✅ Contact form with validation
+✅ PostgreSQL database integration
+✅ Project filtering by category and tech stack
+✅ Admin dashboard for contact messages
+✅ Blog system with markdown support
+✅ Analytics tracking (page views, section visibility)
+✅ Resume/CV download
+✅ Admin CRUD for home, about, skills, projects, certificates content
 
-**Database Schema (Prepared for Migration)**
-- **Drizzle ORM** configured for PostgreSQL with schema definitions in `shared/schema.ts`
-- **Schema Tables**:
-  - `users`: User accounts with username/password authentication (prepared but not actively used)
-  - `contact_messages`: Stores visitor contact form submissions
-- Schema uses `gen_random_uuid()` for primary keys
-- Prepared for Neon serverless PostgreSQL integration (`@neondatabase/serverless`)
+## Running the Application
 
-**Migration Strategy**
-- Drizzle Kit configured with `drizzle.config.ts` pointing to PostgreSQL dialect
-- Migration files output to `./migrations` directory
-- Current storage abstraction (`IStorage` interface) allows easy swapping to database implementation
+Development:
+```bash
+npm run dev
+```
 
-### External Dependencies
+Database migrations:
+```bash
+npm run db:push
+```
 
-**UI & Animation Libraries**
-- **Radix UI**: Accessible component primitives (dialogs, dropdowns, accordions, etc.)
-- **Framer Motion**: Animation and gesture library
-- **React Icons**: Icon library for tech stack and social media icons
-- **Lucide React**: Additional icon set for UI elements
-- **cmdk**: Command palette component
-- **Embla Carousel**: Carousel/slider component
-- **Vaul**: Drawer component for mobile interfaces
+Build for production:
+```bash
+npm run build
+```
 
-**Form & Data Management**
-- **React Hook Form**: Form state management with minimal re-renders
-- **Zod**: Schema validation for both client and server
-- **@tanstack/react-query**: Server state management and caching
-- **date-fns**: Date formatting and manipulation
+## Known Issues
 
-**Development & Build Tools**
-- **TypeScript**: Type checking across the entire codebase
-- **Vite**: Fast build tool and development server
-- **esbuild**: JavaScript bundler for production server build
-- **PostCSS & Autoprefixer**: CSS processing
-- **Drizzle Kit**: Database migration tool
+- Database endpoint may require re-enabling in Neon console if disabled
+- Admin password uses environment variable `ADMIN_PASSWORD` (defaults to "admin123")
 
-**Utility Libraries**
-- **clsx & tailwind-merge**: Conditional className composition
-- **class-variance-authority**: Type-safe component variants
-- **nanoid**: Unique ID generation
-- **uuid**: UUID generation for storage layer
+## Next Steps (Future Work)
 
-**Potential Future Integrations** (dependencies installed but not currently active)
-- **Neon Database**: Serverless PostgreSQL for production data storage
-- **Passport.js**: Authentication middleware (user system prepared in schema)
-- Session management via `express-session` and `connect-pg-simple`
-
-**Font Resources**
-- Google Fonts: DM Sans, Fira Code, Geist Mono, Architects Daughter
-- Fonts loaded via CDN in `client/index.html`
+- User authentication system using Passport.js
+- Image upload functionality for projects and certificates
+- Email notifications for contact form submissions
+- Advanced analytics dashboard with charts
+- SEO optimization for blog posts
+- Social media integration

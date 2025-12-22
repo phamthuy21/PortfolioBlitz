@@ -1,7 +1,16 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertBlogPostSchema, insertAnalyticsEventSchema } from "@shared/schema";
+import { 
+  insertContactMessageSchema, 
+  insertBlogPostSchema, 
+  insertAnalyticsEventSchema,
+  insertHomeContentSchema,
+  insertAboutContentSchema,
+  insertSkillSchema,
+  insertProjectSchema,
+  insertCertificateSchema,
+} from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -274,6 +283,160 @@ export async function registerRoutes(
         success: false,
         message: "An error occurred.",
       });
+    }
+  });
+
+  // Home Content
+  app.get("/api/admin/home", adminAuth, async (req, res) => {
+    try {
+      const content = await storage.getHomeContent();
+      res.json({ success: true, data: content });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error retrieving home content" });
+    }
+  });
+
+  app.put("/api/admin/home", adminAuth, async (req, res) => {
+    try {
+      const data = insertHomeContentSchema.parse(req.body);
+      const content = await storage.upsertHomeContent(data);
+      res.json({ success: true, data: content });
+    } catch (error) {
+      res.status(400).json({ success: false, message: "Invalid data" });
+    }
+  });
+
+  // About Content
+  app.get("/api/admin/about", adminAuth, async (req, res) => {
+    try {
+      const content = await storage.getAboutContent();
+      res.json({ success: true, data: content });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error retrieving about content" });
+    }
+  });
+
+  app.put("/api/admin/about", adminAuth, async (req, res) => {
+    try {
+      const data = insertAboutContentSchema.parse(req.body);
+      const content = await storage.upsertAboutContent(data);
+      res.json({ success: true, data: content });
+    } catch (error) {
+      res.status(400).json({ success: false, message: "Invalid data" });
+    }
+  });
+
+  // Skills
+  app.get("/api/admin/skills", adminAuth, async (req, res) => {
+    try {
+      const skills = await storage.getSkills();
+      res.json({ success: true, data: skills });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  app.post("/api/admin/skills", adminAuth, async (req, res) => {
+    try {
+      const data = insertSkillSchema.parse(req.body);
+      const skill = await storage.createSkill(data);
+      res.status(201).json({ success: true, data: skill });
+    } catch (error) {
+      res.status(400).json({ success: false, message: "Invalid data" });
+    }
+  });
+
+  app.patch("/api/admin/skills/:id", adminAuth, async (req, res) => {
+    try {
+      const skill = await storage.updateSkill(req.params.id, req.body);
+      res.json({ success: true, data: skill });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  app.delete("/api/admin/skills/:id", adminAuth, async (req, res) => {
+    try {
+      await storage.deleteSkill(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  // Projects
+  app.get("/api/admin/projects", adminAuth, async (req, res) => {
+    try {
+      const projects = await storage.getProjects();
+      res.json({ success: true, data: projects });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  app.post("/api/admin/projects", adminAuth, async (req, res) => {
+    try {
+      const data = insertProjectSchema.parse(req.body);
+      const project = await storage.createProject(data);
+      res.status(201).json({ success: true, data: project });
+    } catch (error) {
+      res.status(400).json({ success: false, message: "Invalid data" });
+    }
+  });
+
+  app.patch("/api/admin/projects/:id", adminAuth, async (req, res) => {
+    try {
+      const project = await storage.updateProject(req.params.id, req.body);
+      res.json({ success: true, data: project });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  app.delete("/api/admin/projects/:id", adminAuth, async (req, res) => {
+    try {
+      await storage.deleteProject(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  // Certificates
+  app.get("/api/admin/certificates", adminAuth, async (req, res) => {
+    try {
+      const certs = await storage.getCertificates();
+      res.json({ success: true, data: certs });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  app.post("/api/admin/certificates", adminAuth, async (req, res) => {
+    try {
+      const data = insertCertificateSchema.parse(req.body);
+      const cert = await storage.createCertificate(data);
+      res.status(201).json({ success: true, data: cert });
+    } catch (error) {
+      res.status(400).json({ success: false, message: "Invalid data" });
+    }
+  });
+
+  app.patch("/api/admin/certificates/:id", adminAuth, async (req, res) => {
+    try {
+      const cert = await storage.updateCertificate(req.params.id, req.body);
+      res.json({ success: true, data: cert });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
+    }
+  });
+
+  app.delete("/api/admin/certificates/:id", adminAuth, async (req, res) => {
+    try {
+      await storage.deleteCertificate(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Error" });
     }
   });
 

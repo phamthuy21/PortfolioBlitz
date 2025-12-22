@@ -9,10 +9,25 @@ import {
   type InsertBlogPost,
   type AnalyticsEvent,
   type InsertAnalyticsEvent,
+  type HomeContent,
+  type InsertHomeContent,
+  type AboutContent,
+  type InsertAboutContent,
+  type Skill,
+  type InsertSkill,
+  type ProjectDb,
+  type InsertProject,
+  type Certificate,
+  type InsertCertificate,
   users,
   contactMessages,
   blogPosts,
   analyticsEvents,
+  homeContent,
+  aboutContent,
+  skills,
+  projects,
+  certificates,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -41,6 +56,27 @@ export interface IStorage {
     sectionViews: Record<string, number>;
     pageViews: Record<string, number>;
   }>;
+  
+  getHomeContent(): Promise<HomeContent | undefined>;
+  upsertHomeContent(content: InsertHomeContent): Promise<HomeContent>;
+  
+  getAboutContent(): Promise<AboutContent | undefined>;
+  upsertAboutContent(content: InsertAboutContent): Promise<AboutContent>;
+  
+  createSkill(skill: InsertSkill): Promise<Skill>;
+  getSkills(): Promise<Skill[]>;
+  updateSkill(id: string, skill: Partial<InsertSkill>): Promise<Skill | undefined>;
+  deleteSkill(id: string): Promise<void>;
+  
+  createProject(project: InsertProject): Promise<ProjectDb>;
+  getProjects(): Promise<ProjectDb[]>;
+  updateProject(id: string, project: Partial<InsertProject>): Promise<ProjectDb | undefined>;
+  deleteProject(id: string): Promise<void>;
+  
+  createCertificate(cert: InsertCertificate): Promise<Certificate>;
+  getCertificates(): Promise<Certificate[]>;
+  updateCertificate(id: string, cert: Partial<InsertCertificate>): Promise<Certificate | undefined>;
+  deleteCertificate(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -155,6 +191,90 @@ export class DatabaseStorage implements IStorage {
       sectionViews,
       pageViews,
     };
+  }
+
+  async getHomeContent(): Promise<HomeContent | undefined> {
+    const [content] = await db.select().from(homeContent);
+    return content;
+  }
+
+  async upsertHomeContent(content: InsertHomeContent): Promise<HomeContent> {
+    const existing = await this.getHomeContent();
+    if (existing) {
+      const [updated] = await db.update(homeContent).set({ ...content, updatedAt: new Date() }).returning();
+      return updated;
+    }
+    const [created] = await db.insert(homeContent).values(content).returning();
+    return created;
+  }
+
+  async getAboutContent(): Promise<AboutContent | undefined> {
+    const [content] = await db.select().from(aboutContent);
+    return content;
+  }
+
+  async upsertAboutContent(content: InsertAboutContent): Promise<AboutContent> {
+    const existing = await this.getAboutContent();
+    if (existing) {
+      const [updated] = await db.update(aboutContent).set({ ...content, updatedAt: new Date() }).returning();
+      return updated;
+    }
+    const [created] = await db.insert(aboutContent).values(content).returning();
+    return created;
+  }
+
+  async createSkill(skill: InsertSkill): Promise<Skill> {
+    const [created] = await db.insert(skills).values(skill).returning();
+    return created;
+  }
+
+  async getSkills(): Promise<Skill[]> {
+    return db.select().from(skills).orderBy(desc(skills.createdAt));
+  }
+
+  async updateSkill(id: string, skill: Partial<InsertSkill>): Promise<Skill | undefined> {
+    const [updated] = await db.update(skills).set(skill).where(eq(skills.id, id)).returning();
+    return updated;
+  }
+
+  async deleteSkill(id: string): Promise<void> {
+    await db.delete(skills).where(eq(skills.id, id));
+  }
+
+  async createProject(project: InsertProject): Promise<ProjectDb> {
+    const [created] = await db.insert(projects).values(project).returning();
+    return created;
+  }
+
+  async getProjects(): Promise<ProjectDb[]> {
+    return db.select().from(projects).orderBy(desc(projects.createdAt));
+  }
+
+  async updateProject(id: string, project: Partial<InsertProject>): Promise<ProjectDb | undefined> {
+    const [updated] = await db.update(projects).set(project).where(eq(projects.id, id)).returning();
+    return updated;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  async createCertificate(cert: InsertCertificate): Promise<Certificate> {
+    const [created] = await db.insert(certificates).values(cert).returning();
+    return created;
+  }
+
+  async getCertificates(): Promise<Certificate[]> {
+    return db.select().from(certificates).orderBy(desc(certificates.createdAt));
+  }
+
+  async updateCertificate(id: string, cert: Partial<InsertCertificate>): Promise<Certificate | undefined> {
+    const [updated] = await db.update(certificates).set(cert).where(eq(certificates.id, id)).returning();
+    return updated;
+  }
+
+  async deleteCertificate(id: string): Promise<void> {
+    await db.delete(certificates).where(eq(certificates.id, id));
   }
 }
 
