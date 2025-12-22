@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useInView } from "framer-motion";
 import { format } from "date-fns";
@@ -8,6 +8,7 @@ import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { setSEOMeta } from "@/pages/seo";
 import type { BlogPost } from "@shared/schema";
 
 const containerVariants = {
@@ -80,6 +81,14 @@ function BlogPostCard({ post }: { post: BlogPost }) {
 }
 
 export default function BlogPage() {
+  useEffect(() => {
+    setSEOMeta({
+      title: "Blog - Thuy Pham | Web Development Articles",
+      description: "Read articles about web development, full stack technologies, and software engineering best practices.",
+      canonical: "/blog",
+    });
+  }, []);
+
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 

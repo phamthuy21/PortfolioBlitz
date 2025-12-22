@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { motion } from "framer-motion";
@@ -7,6 +8,7 @@ import { Link } from "wouter";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { setSEOMeta } from "@/pages/seo";
 import type { BlogPost } from "@shared/schema";
 
 function MarkdownContent({ content }: { content: string }) {

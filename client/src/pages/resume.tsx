@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Download, ArrowLeft, Mail, MapPin, Phone, ExternalLink, Loader2 } from "lucide-react";
 import { Link } from "wouter";
+import { setSEOMeta } from "@/pages/seo";
 import {
   SiReact,
   SiTypescript,
@@ -84,6 +85,14 @@ export default function ResumePage() {
   const handlePrint = () => {
     window.print();
   };
+
+  useEffect(() => {
+    setSEOMeta({
+      title: "Resume - Thuy Pham | Full Stack Developer",
+      description: "Professional resume and CV showcasing full stack development experience, technical skills, and project portfolio.",
+      canonical: "/resume",
+    });
+  }, []);
 
   useEffect(() => {
     const style = document.createElement("style");
