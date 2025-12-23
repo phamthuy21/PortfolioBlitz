@@ -8,6 +8,37 @@ This is a modern, full-stack personal portfolio website for Thuy Pham, a Full St
 
 Preferred communication style: Simple, everyday language.
 
+## Latest Updates (Current Session)
+
+Added comprehensive admin CRUD system for managing portfolio content:
+
+### New Database Tables (via Drizzle ORM)
+- **home_content**: Hero section configuration (title, subtitle, CTA text)
+- **about_content**: About section data (title, description, bio)
+- **skills**: Skill items with proficiency levels
+- **projects**: Portfolio projects with tech stack
+- **certificates**: Professional certifications
+
+### New API Routes
+- `GET/POST /api/home` - Home content management
+- `GET/POST /api/about` - About content management
+- `GET/POST/PATCH/DELETE /api/skills` - Skills CRUD
+- `GET/POST/PATCH/DELETE /api/projects` - Projects CRUD
+- `GET/POST/PATCH/DELETE /api/certificates` - Certificates CRUD
+
+### New Admin Pages
+- `/admin/content` - Comprehensive content management dashboard with tabs for:
+  - Home section editor
+  - About section editor
+  - Skills manager with add/delete
+  - Projects manager with add/delete
+  - Certificates manager with add/delete
+
+### Storage Layer Updates
+- Extended `IStorage` interface with CRUD methods for all new content types
+- Implemented `DatabaseStorage` methods for all operations
+- All data persisted to PostgreSQL via Drizzle ORM
+
 ## System Architecture
 
 ### Frontend Architecture

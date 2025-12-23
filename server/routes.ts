@@ -1,7 +1,16 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
-import { insertContactMessageSchema, insertBlogPostSchema, insertAnalyticsEventSchema } from "@shared/schema";
+import { 
+  insertContactMessageSchema, 
+  insertBlogPostSchema, 
+  insertAnalyticsEventSchema,
+  insertHomeContentSchema,
+  insertAboutContentSchema,
+  insertSkillSchema,
+  insertProjectSchema,
+  insertCertificateSchema
+} from "@shared/schema";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 
@@ -274,6 +283,199 @@ export async function registerRoutes(
         success: false,
         message: "An error occurred.",
       });
+    }
+  });
+
+  // Home Content Routes
+  app.get("/api/home", async (req, res) => {
+    try {
+      const content = await storage.getHomeContent();
+      res.json({ success: true, data: content || null });
+    } catch (error) {
+      console.error("Error retrieving home content:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.post("/api/admin/home", adminAuth, async (req, res) => {
+    try {
+      const validatedData = insertHomeContentSchema.parse(req.body);
+      const content = await storage.upsertHomeContent(validatedData);
+      res.json({ success: true, data: content });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ success: false, message: fromZodError(error).message });
+      } else {
+        console.error("Error updating home content:", error);
+        res.status(500).json({ success: false, message: "An error occurred." });
+      }
+    }
+  });
+
+  // About Content Routes
+  app.get("/api/about", async (req, res) => {
+    try {
+      const content = await storage.getAboutContent();
+      res.json({ success: true, data: content || null });
+    } catch (error) {
+      console.error("Error retrieving about content:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.post("/api/admin/about", adminAuth, async (req, res) => {
+    try {
+      const validatedData = insertAboutContentSchema.parse(req.body);
+      const content = await storage.upsertAboutContent(validatedData);
+      res.json({ success: true, data: content });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ success: false, message: fromZodError(error).message });
+      } else {
+        console.error("Error updating about content:", error);
+        res.status(500).json({ success: false, message: "An error occurred." });
+      }
+    }
+  });
+
+  // Skills Routes
+  app.get("/api/skills", async (req, res) => {
+    try {
+      const skillsList = await storage.getSkills();
+      res.json({ success: true, data: skillsList });
+    } catch (error) {
+      console.error("Error retrieving skills:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.post("/api/admin/skills", adminAuth, async (req, res) => {
+    try {
+      const validatedData = insertSkillSchema.parse(req.body);
+      const skill = await storage.createSkill(validatedData);
+      res.status(201).json({ success: true, data: skill });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ success: false, message: fromZodError(error).message });
+      } else {
+        console.error("Error creating skill:", error);
+        res.status(500).json({ success: false, message: "An error occurred." });
+      }
+    }
+  });
+
+  app.patch("/api/admin/skills/:id", adminAuth, async (req, res) => {
+    try {
+      const skill = await storage.updateSkill(req.params.id, req.body);
+      if (!skill) return res.status(404).json({ success: false, message: "Skill not found" });
+      res.json({ success: true, data: skill });
+    } catch (error) {
+      console.error("Error updating skill:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.delete("/api/admin/skills/:id", adminAuth, async (req, res) => {
+    try {
+      await storage.deleteSkill(req.params.id);
+      res.json({ success: true, message: "Skill deleted" });
+    } catch (error) {
+      console.error("Error deleting skill:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  // Projects Routes
+  app.get("/api/projects", async (req, res) => {
+    try {
+      const projectsList = await storage.getProjects();
+      res.json({ success: true, data: projectsList });
+    } catch (error) {
+      console.error("Error retrieving projects:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.post("/api/admin/projects", adminAuth, async (req, res) => {
+    try {
+      const validatedData = insertProjectSchema.parse(req.body);
+      const project = await storage.createProject(validatedData);
+      res.status(201).json({ success: true, data: project });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ success: false, message: fromZodError(error).message });
+      } else {
+        console.error("Error creating project:", error);
+        res.status(500).json({ success: false, message: "An error occurred." });
+      }
+    }
+  });
+
+  app.patch("/api/admin/projects/:id", adminAuth, async (req, res) => {
+    try {
+      const project = await storage.updateProject(req.params.id, req.body);
+      if (!project) return res.status(404).json({ success: false, message: "Project not found" });
+      res.json({ success: true, data: project });
+    } catch (error) {
+      console.error("Error updating project:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.delete("/api/admin/projects/:id", adminAuth, async (req, res) => {
+    try {
+      await storage.deleteProject(req.params.id);
+      res.json({ success: true, message: "Project deleted" });
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  // Certificates Routes
+  app.get("/api/certificates", async (req, res) => {
+    try {
+      const certsList = await storage.getCertificates();
+      res.json({ success: true, data: certsList });
+    } catch (error) {
+      console.error("Error retrieving certificates:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.post("/api/admin/certificates", adminAuth, async (req, res) => {
+    try {
+      const validatedData = insertCertificateSchema.parse(req.body);
+      const certificate = await storage.createCertificate(validatedData);
+      res.status(201).json({ success: true, data: certificate });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ success: false, message: fromZodError(error).message });
+      } else {
+        console.error("Error creating certificate:", error);
+        res.status(500).json({ success: false, message: "An error occurred." });
+      }
+    }
+  });
+
+  app.patch("/api/admin/certificates/:id", adminAuth, async (req, res) => {
+    try {
+      const certificate = await storage.updateCertificate(req.params.id, req.body);
+      if (!certificate) return res.status(404).json({ success: false, message: "Certificate not found" });
+      res.json({ success: true, data: certificate });
+    } catch (error) {
+      console.error("Error updating certificate:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
+    }
+  });
+
+  app.delete("/api/admin/certificates/:id", adminAuth, async (req, res) => {
+    try {
+      await storage.deleteCertificate(req.params.id);
+      res.json({ success: true, message: "Certificate deleted" });
+    } catch (error) {
+      console.error("Error deleting certificate:", error);
+      res.status(500).json({ success: false, message: "An error occurred." });
     }
   });
 

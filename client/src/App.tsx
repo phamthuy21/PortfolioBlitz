@@ -10,6 +10,7 @@ import AdminBlogEditor from "@/pages/admin-blog-editor";
 import BlogPage from "@/pages/blog";
 import BlogPostPage from "@/pages/blog-post";
 import ResumePage from "@/pages/resume";
+import AdminContentPage from "@/pages/admin-content";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/admin/blog/:id" component={AdminBlogEditor} />
+      <Route path="/admin/content" component={AdminContentPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
       <Route path="/resume" component={ResumePage} />
