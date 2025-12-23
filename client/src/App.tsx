@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import Home from "@/pages/home";
 import AdminPage from "@/pages/admin";
 import AdminBlogEditor from "@/pages/admin-blog-editor";
-import AdminContent from "@/pages/admin-content";
 import BlogPage from "@/pages/blog";
 import BlogPostPage from "@/pages/blog-post";
 import ResumePage from "@/pages/resume";
@@ -19,7 +18,6 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/admin/blog/:id" component={AdminBlogEditor} />
-      <Route path="/admin/content" component={AdminContent} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
       <Route path="/resume" component={ResumePage} />
