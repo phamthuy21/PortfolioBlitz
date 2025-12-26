@@ -455,6 +455,8 @@ function BlogTab({ token }: { token: string }) {
   );
 }
 
+import { AdminNavbar } from "@/components/AdminNavbar";
+
 function ContentTab({ token }: { token: string }) {
   const contentLinks = [
     { title: "Home Section", href: "/admin/home", icon: Home, description: "Hero title, subtitle, and CTA" },
@@ -474,7 +476,7 @@ function ContentTab({ token }: { token: string }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {contentLinks.map((link) => (
           <Link key={link.href} href={link.href}>
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
+            <Card className="hover:border-primary/50 transition-colors cursor-pointer group hover-elevate">
               <CardHeader className="flex flex-row items-center gap-4">
                 <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
                   <link.icon className="h-6 w-6 text-primary" />
@@ -492,27 +494,49 @@ function ContentTab({ token }: { token: string }) {
   );
 }
 
+function AdminNavbar({ token, onLogout }: { token: string; onLogout: () => void }) {
+  return (
+    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Link href="/admin">
+            <Button variant="ghost" size="sm" className="font-bold text-lg px-2" data-testid="link-admin-root">
+              Admin
+            </Button>
+          </Link>
+          <nav className="hidden md:flex items-center gap-2">
+            <Link href="/admin/home">
+              <Button variant="ghost" size="sm" className="text-sm">Home</Button>
+            </Link>
+            <Link href="/admin/about">
+              <Button variant="ghost" size="sm" className="text-sm">About</Button>
+            </Link>
+            <Link href="/admin/skills">
+              <Button variant="ghost" size="sm" className="text-sm">Skills</Button>
+            </Link>
+            <Link href="/admin/projects">
+              <Button variant="ghost" size="sm" className="text-sm">Projects</Button>
+            </Link>
+            <Link href="/admin/certificates">
+              <Button variant="ghost" size="sm" className="text-sm">Certs</Button>
+            </Link>
+          </nav>
+        </div>
+        <div className="flex items-center gap-2">
+          <DarkModeToggle />
+          <Button variant="outline" size="sm" onClick={onLogout} data-testid="button-logout">
+            Logout
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => void }) {
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/">
-              <Button variant="ghost" size="icon" data-testid="button-back-home">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <h1 className="text-xl font-bold" data-testid="text-admin-title">Admin Dashboard</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <DarkModeToggle />
-            <Button variant="outline" size="sm" onClick={onLogout} data-testid="button-logout">
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AdminNavbar token={token} onLogout={onLogout} />
 
       <main className="max-w-6xl mx-auto px-4 py-8">
         <Tabs defaultValue="messages" className="space-y-6">

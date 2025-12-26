@@ -4,12 +4,13 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus, ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { AdminNavbar } from "@/components/AdminNavbar";
 
 export default function AdminSkillsPage() {
   const { toast } = useToast();
+  const token = localStorage.getItem("adminToken");
   const [showAddForm, setShowAddForm] = useState(false);
   const { data: skillsData } = useQuery<any>({ queryKey: ["/api/skills"] });
   const [skillForm, setSkillForm] = useState({ name: "", icon: "", category: "frontend", proficiency: 50 });
@@ -34,18 +35,22 @@ export default function AdminSkillsPage() {
     onError: () => toast({ title: "Error deleting skill", variant: "destructive" }),
   });
 
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    window.location.href = "/admin";
+  };
+
+  if (!token) {
+    window.location.href = "/admin";
+    return null;
+  }
+
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      <AdminNavbar token={token} onLogout={handleLogout} />
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/admin">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
-            <h1 className="text-3xl font-bold">Manage Skills</h1>
-          </div>
+          <h1 className="text-3xl font-bold">Manage Skills</h1>
           <Button onClick={() => setShowAddForm(!showAddForm)}>
             <Plus className="mr-2 h-4 w-4" /> Add Skill
           </Button>
@@ -88,3 +93,4 @@ export default function AdminSkillsPage() {
     </div>
   );
 }
+
