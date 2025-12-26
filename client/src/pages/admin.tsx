@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
-import { Mail, Trash2, Check, Eye, ArrowLeft, Lock, Loader2, BarChart3, FileText } from "lucide-react";
+import { Mail, Trash2, Check, Eye, ArrowLeft, Lock, Loader2, BarChart3, FileText, Home, User, Lightbulb, Briefcase, Award, Settings } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -455,6 +455,43 @@ function BlogTab({ token }: { token: string }) {
   );
 }
 
+function ContentTab({ token }: { token: string }) {
+  const contentLinks = [
+    { title: "Home Section", href: "/admin/home", icon: Home, description: "Hero title, subtitle, and CTA" },
+    { title: "About Section", href: "/admin/about", icon: User, description: "Personal bio and introduction" },
+    { title: "Skills", href: "/admin/skills", icon: Lightbulb, description: "Technical skills and proficiency" },
+    { title: "Projects", href: "/admin/projects", icon: Briefcase, description: "Portfolio projects and tech stack" },
+    { title: "Certificates", href: "/admin/certificates", icon: Award, description: "Professional certifications" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Content Management</h2>
+        <p className="text-muted-foreground">Manage your portfolio content</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {contentLinks.map((link) => (
+          <Link key={link.href} href={link.href}>
+            <Card className="hover:border-primary/50 transition-colors cursor-pointer group">
+              <CardHeader className="flex flex-row items-center gap-4">
+                <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <link.icon className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">{link.title}</CardTitle>
+                  <CardDescription>{link.description}</CardDescription>
+                </div>
+              </CardHeader>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => void }) {
   return (
     <div className="min-h-screen bg-background">
@@ -484,6 +521,10 @@ function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => vo
               <Mail className="mr-2 h-4 w-4" />
               Messages
             </TabsTrigger>
+            <TabsTrigger value="content" data-testid="tab-content">
+              <Settings className="mr-2 h-4 w-4" />
+              Content
+            </TabsTrigger>
             <TabsTrigger value="blog" data-testid="tab-blog">
               <FileText className="mr-2 h-4 w-4" />
               Blog
@@ -498,6 +539,10 @@ function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => vo
             <MessagesTab token={token} />
           </TabsContent>
 
+          <TabsContent value="content">
+            <ContentTab token={token} />
+          </TabsContent>
+
           <TabsContent value="blog">
             <BlogTab token={token} />
           </TabsContent>
@@ -510,6 +555,7 @@ function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => vo
     </div>
   );
 }
+
 
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(() => {
