@@ -494,45 +494,6 @@ function ContentTab({ token }: { token: string }) {
   );
 }
 
-function AdminNavbar({ token, onLogout }: { token: string; onLogout: () => void }) {
-  return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Link href="/admin">
-            <Button variant="ghost" size="sm" className="font-bold text-lg px-2" data-testid="link-admin-root">
-              Admin
-            </Button>
-          </Link>
-          <nav className="hidden md:flex items-center gap-2">
-            <Link href="/admin/home">
-              <Button variant="ghost" size="sm" className="text-sm">Home</Button>
-            </Link>
-            <Link href="/admin/about">
-              <Button variant="ghost" size="sm" className="text-sm">About</Button>
-            </Link>
-            <Link href="/admin/skills">
-              <Button variant="ghost" size="sm" className="text-sm">Skills</Button>
-            </Link>
-            <Link href="/admin/projects">
-              <Button variant="ghost" size="sm" className="text-sm">Projects</Button>
-            </Link>
-            <Link href="/admin/certificates">
-              <Button variant="ghost" size="sm" className="text-sm">Certs</Button>
-            </Link>
-          </nav>
-        </div>
-        <div className="flex items-center gap-2">
-          <DarkModeToggle />
-          <Button variant="outline" size="sm" onClick={onLogout} data-testid="button-logout">
-            Logout
-          </Button>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => void }) {
   return (
     <div className="min-h-screen bg-background">
