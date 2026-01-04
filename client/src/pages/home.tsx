@@ -3,6 +3,7 @@ import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/sections/Hero";
 import { About } from "@/components/sections/About";
 import { Projects } from "@/components/sections/Projects";
+import { Certificates } from "@/components/sections/Certificates";
 import { Contact } from "@/components/sections/Contact";
 import { Footer } from "@/components/sections/Footer";
 import { useAnalytics, useSectionTracking } from "@/hooks/use-analytics";
@@ -17,6 +18,7 @@ export default function Home() {
   useSectionTracking("home");
   useSectionTracking("about");
   useSectionTracking("projects");
+  useSectionTracking("certificates");
   useSectionTracking("contact");
 
   return (
@@ -26,6 +28,7 @@ export default function Home() {
         <Hero />
         <About />
         <Projects />
+        <Certificates />
         <Contact />
       </main>
       <Footer />

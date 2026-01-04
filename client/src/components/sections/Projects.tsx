@@ -4,82 +4,12 @@ import { Github, ExternalLink, Code2, ShoppingCart, CheckSquare, Brain, Building
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
 
 const projectIcons = [ShoppingCart, CheckSquare, Brain, Building2, Heart, Share2];
 
 type ProjectCategory = "all" | "frontend" | "backend" | "fullstack" | "mobile";
-
-interface ExtendedProject extends Project {
-  category: ProjectCategory;
-}
-
-const projects: ExtendedProject[] = [
-  {
-    id: 1,
-    title: "E-Commerce Platform",
-    description:
-      "A full-featured e-commerce platform with real-time inventory management, payment processing, and an admin dashboard.",
-    image: "",
-    techStack: ["React", "Node.js", "PostgreSQL", "Stripe"],
-    githubUrl: "https://github.com",
-    liveUrl: "https://example.com",
-    category: "fullstack",
-  },
-  {
-    id: 2,
-    title: "Task Management App",
-    description:
-      "A collaborative task management application with real-time updates, team workspaces, and project analytics.",
-    image: "",
-    techStack: ["Next.js", "TypeScript", "MongoDB", "Socket.io"],
-    githubUrl: "https://github.com",
-    liveUrl: "https://example.com",
-    category: "fullstack",
-  },
-  {
-    id: 3,
-    title: "AI Content Generator",
-    description:
-      "An AI-powered content generation tool that helps create blog posts, social media content, and marketing copy.",
-    image: "",
-    techStack: ["React", "Python", "OpenAI", "FastAPI"],
-    githubUrl: "https://github.com",
-    category: "backend",
-  },
-  {
-    id: 4,
-    title: "Real Estate Portal",
-    description:
-      "A comprehensive real estate platform with property listings, virtual tours, and mortgage calculator.",
-    image: "",
-    techStack: ["React", "Node.js", "PostgreSQL", "MapBox"],
-    githubUrl: "https://github.com",
-    liveUrl: "https://example.com",
-    category: "fullstack",
-  },
-  {
-    id: 5,
-    title: "Health & Fitness Tracker",
-    description:
-      "A health tracking application that monitors workouts, nutrition, sleep patterns, and provides personalized insights.",
-    image: "",
-    techStack: ["React Native", "Node.js", "MongoDB", "Charts.js"],
-    githubUrl: "https://github.com",
-    category: "mobile",
-  },
-  {
-    id: 6,
-    title: "Social Media Dashboard",
-    description:
-      "A unified dashboard for managing multiple social media accounts with scheduling, analytics, and engagement tools.",
-    image: "",
-    techStack: ["Vue.js", "Python", "Redis", "GraphQL"],
-    githubUrl: "https://github.com",
-    liveUrl: "https://example.com",
-    category: "frontend",
-  },
-];
 
 const categories: { value: ProjectCategory; label: string }[] = [
   { value: "all", label: "All Projects" },
@@ -88,10 +18,6 @@ const categories: { value: ProjectCategory; label: string }[] = [
   { value: "backend", label: "Backend" },
   { value: "mobile", label: "Mobile" },
 ];
-
-const allTechStacks = Array.from(
-  new Set(projects.flatMap((p) => p.techStack))
-).sort();
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -112,7 +38,7 @@ const cardVariants = {
   },
 };
 
-function ProjectCard({ project, index }: { project: ExtendedProject; index: number }) {
+function ProjectCard({ project, index }: { project: Project; index: number }) {
   const IconComponent = projectIcons[index % projectIcons.length] || Code2;
 
   return (
@@ -123,10 +49,18 @@ function ProjectCard({ project, index }: { project: ExtendedProject; index: numb
       >
         <CardHeader className="p-0">
           <div className="relative h-48 overflow-hidden rounded-t-md bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20 flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center gap-2 transition-transform duration-300 group-hover:scale-110">
-              <IconComponent className="w-12 h-12 text-primary/50" />
-              <span className="text-xl font-bold text-primary/40">{project.title.charAt(0)}</span>
-            </div>
+            {project.image ? (
+              <img 
+                src={project.image} 
+                alt={project.title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 transition-transform duration-300 group-hover:scale-110">
+                <IconComponent className="w-12 h-12 text-primary/50" />
+                <span className="text-xl font-bold text-primary/40">{project.title.charAt(0)}</span>
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         </CardHeader>
@@ -145,7 +79,7 @@ function ProjectCard({ project, index }: { project: ExtendedProject; index: numb
             {project.description}
           </p>
           <div className="flex flex-wrap gap-2" data-testid={`container-tech-stack-${project.id}`}>
-            {project.techStack.map((tech) => (
+            {project.techStack?.map((tech) => (
               <Badge
                 key={tech}
                 variant="secondary"
@@ -159,19 +93,21 @@ function ProjectCard({ project, index }: { project: ExtendedProject; index: numb
         </CardContent>
 
         <CardFooter className="p-5 pt-0 gap-2 flex-wrap">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => window.open(project.githubUrl, "_blank")}
-            data-testid={`button-github-${project.id}`}
-          >
-            <Github className="mr-2 h-4 w-4" />
-            Code
-          </Button>
+          {project.githubUrl && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => window.open(project.githubUrl!, "_blank")}
+              data-testid={`button-github-${project.id}`}
+            >
+              <Github className="mr-2 h-4 w-4" />
+              Code
+            </Button>
+          )}
           {project.liveUrl && (
             <Button
               size="sm"
-              onClick={() => window.open(project.liveUrl, "_blank")}
+              onClick={() => window.open(project.liveUrl!, "_blank")}
               data-testid={`button-live-${project.id}`}
             >
               <ExternalLink className="mr-2 h-4 w-4" />
@@ -187,20 +123,26 @@ function ProjectCard({ project, index }: { project: ExtendedProject; index: numb
 export function Projects() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>("all");
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      const categoryMatch = selectedCategory === "all" || project.category === selectedCategory;
-      const techMatch = !selectedTech || project.techStack.includes(selectedTech);
-      return categoryMatch && techMatch;
-    });
-  }, [selectedCategory, selectedTech]);
+  const { data: projectsData } = useQuery<{ success: boolean; data: Project[] }>({
+    queryKey: ["/api/projects"],
+  });
 
-  const handleCategoryChange = (category: ProjectCategory) => {
-    setSelectedCategory(category);
-  };
+  const projectsList = projectsData?.data || [];
+
+  const allTechStacks = useMemo(() => {
+    return Array.from(
+      new Set(projectsList.flatMap((p) => p.techStack || []))
+    ).sort();
+  }, [projectsList]);
+
+  const filteredProjects = useMemo(() => {
+    return projectsList.filter((project) => {
+      const techMatch = !selectedTech || project.techStack?.includes(selectedTech);
+      return techMatch;
+    });
+  }, [projectsList, selectedTech]);
 
   const handleTechChange = (tech: string | null) => {
     setSelectedTech(tech);
@@ -233,21 +175,6 @@ export function Projects() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-10 space-y-4"
         >
-          <div className="flex flex-wrap justify-center gap-2" data-testid="filter-categories">
-            {categories.map((category) => (
-              <Button
-                key={category.value}
-                size="sm"
-                variant={selectedCategory === category.value ? "default" : "outline"}
-                onClick={() => handleCategoryChange(category.value)}
-                className="transition-all duration-200"
-                data-testid={`button-filter-${category.value}`}
-              >
-                {category.label}
-              </Button>
-            ))}
-          </div>
-
           <div className="flex flex-wrap justify-center gap-2" data-testid="filter-tech-stack">
             <Badge
               variant={selectedTech === null ? "default" : "outline"}
@@ -273,7 +200,7 @@ export function Projects() {
 
         {filteredProjects.length > 0 ? (
           <motion.div
-            key={`${selectedCategory}-${selectedTech}`}
+            key={selectedTech || "all"}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -292,20 +219,21 @@ export function Projects() {
             data-testid="text-no-projects"
           >
             <p className="text-muted-foreground text-lg">
-              No projects match the selected filters.
+              {projectsList.length === 0 ? "No projects found. Add some in the admin panel!" : "No projects match the selected filters."}
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-4"
-              onClick={() => {
-                setSelectedCategory("all");
-                setSelectedTech(null);
-              }}
-              data-testid="button-clear-filters"
-            >
-              Clear Filters
-            </Button>
+            {projectsList.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => {
+                  setSelectedTech(null);
+                }}
+                data-testid="button-clear-filters"
+              >
+                Clear Filters
+              </Button>
+            )}
           </motion.div>
         )}
 
@@ -316,7 +244,7 @@ export function Projects() {
           className="text-center mt-8 text-sm text-muted-foreground"
           data-testid="text-filter-count"
         >
-          Showing {filteredProjects.length} of {projects.length} projects
+          Showing {filteredProjects.length} of {projectsList.length} projects
         </motion.div>
       </div>
     </section>

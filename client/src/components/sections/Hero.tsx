@@ -3,15 +3,17 @@ import { motion } from "framer-motion";
 import { Download, Mail, ChevronDown, User } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import type { HomeContent } from "@shared/schema";
 
-const subtitles = [
-  "Building modern web applications",
-  "Creating seamless user experiences",
-  "Turning ideas into reality",
-  "Passionate about clean code",
-];
-
-function TypewriterText() {
+function TypewriterText({ text }: { text?: string | null }) {
+  const subtitles = text ? text.split(",").map(s => s.trim()) : [
+    "Building modern web applications",
+    "Creating seamless user experiences",
+    "Turning ideas into reality",
+    "Passionate about clean code",
+  ];
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -39,7 +41,7 @@ function TypewriterText() {
     );
 
     return () => clearTimeout(timeout);
-  }, [displayText, isDeleting, currentIndex]);
+  }, [displayText, isDeleting, currentIndex, subtitles]);
 
   return (
     <span className="text-muted-foreground">
@@ -81,6 +83,12 @@ function FloatingElement({
 }
 
 export function Hero() {
+  const { data: homeData } = useQuery<{ success: boolean; data: HomeContent }>({
+    queryKey: ["/api/home"],
+  });
+
+  const content = homeData?.data;
+
   const scrollToContact = () => {
     const element = document.querySelector("#contact");
     if (element) {
@@ -154,7 +162,7 @@ export function Hero() {
               className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-muted-foreground mb-6"
               data-testid="text-hero-title"
             >
-              Full Stack Developer
+              {content?.heroTitle || "Full Stack Developer"}
             </motion.h2>
 
             <motion.div
@@ -164,7 +172,7 @@ export function Hero() {
               className="text-lg sm:text-xl h-8 mb-8"
               data-testid="text-hero-typewriter"
             >
-              <TypewriterText />
+              <TypewriterText text={content?.heroSubtitle} />
             </motion.div>
 
             <motion.div
@@ -179,7 +187,7 @@ export function Hero() {
                   data-testid="button-download-cv"
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  Download CV
+                  {content?.ctaText || "Download CV"}
                 </Button>
               </Link>
               <Button

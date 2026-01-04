@@ -2,36 +2,10 @@ import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
 import { User } from "lucide-react";
-import {
-  SiReact,
-  SiTypescript,
-  SiNodedotjs,
-  SiPostgresql,
-  SiTailwindcss,
-  SiGit,
-  SiDocker,
-  SiFigma,
-  SiMongodb,
-  SiPython,
-  SiNextdotjs,
-  SiAmazonwebservices,
-} from "react-icons/si";
+import * as SiIcons from "react-icons/si";
 import { Card, CardContent } from "@/components/ui/card";
-
-const skills = [
-  { name: "React", icon: SiReact, category: "frontend" },
-  { name: "TypeScript", icon: SiTypescript, category: "frontend" },
-  { name: "Next.js", icon: SiNextdotjs, category: "frontend" },
-  { name: "Tailwind CSS", icon: SiTailwindcss, category: "frontend" },
-  { name: "Node.js", icon: SiNodedotjs, category: "backend" },
-  { name: "Python", icon: SiPython, category: "backend" },
-  { name: "PostgreSQL", icon: SiPostgresql, category: "backend" },
-  { name: "MongoDB", icon: SiMongodb, category: "backend" },
-  { name: "Git", icon: SiGit, category: "tools" },
-  { name: "Docker", icon: SiDocker, category: "tools" },
-  { name: "AWS", icon: SiAmazonwebservices, category: "tools" },
-  { name: "Figma", icon: SiFigma, category: "tools" },
-];
+import { useQuery } from "@tanstack/react-query";
+import type { AboutContent, Skill } from "@shared/schema";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,13 +28,14 @@ const itemVariants = {
 
 function SkillCard({
   name,
-  icon: Icon,
+  iconName,
   index,
 }: {
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
+  iconName: string;
   index: number;
 }) {
+  const Icon = (SiIcons as any)[iconName] || SiIcons.SiCodeclimate;
   return (
     <motion.div variants={itemVariants}>
       <Card 
@@ -84,6 +59,17 @@ export function About() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
+  const { data: aboutData } = useQuery<{ success: boolean; data: AboutContent }>({
+    queryKey: ["/api/about"],
+  });
+
+  const { data: skillsData } = useQuery<{ success: boolean; data: Skill[] }>({
+    queryKey: ["/api/skills"],
+  });
+
+  const content = aboutData?.data;
+  const skills = skillsData?.data || [];
+
   return (
     <section id="about" className="py-20 lg:py-32" ref={ref} data-testid="section-about">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,10 +83,10 @@ export function About() {
             className="text-3xl sm:text-4xl font-bold mb-4"
             data-testid="text-about-title"
           >
-            About Me
+            {content?.title || "About Me"}
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto" data-testid="text-about-subtitle">
-            Get to know more about me and my technical expertise
+            {content?.description || "Get to know more about me and my technical expertise"}
           </p>
         </motion.div>
 
@@ -131,51 +117,58 @@ export function About() {
             className="lg:w-2/3"
           >
             <div className="space-y-4 text-muted-foreground mb-8">
-              <p data-testid="text-about-description-1">
-                I'm a passionate Full Stack Developer with over 5 years of
-                experience building modern web applications. I specialize in
-                creating seamless user experiences with React and building
-                robust backend systems with Node.js and Python.
-              </p>
-              <p data-testid="text-about-description-2">
-                My journey in software development started with a curiosity
-                about how things work on the web. Today, I'm dedicated to
-                writing clean, maintainable code and continuously learning new
-                technologies to stay at the forefront of web development.
-              </p>
-              <p data-testid="text-about-description-3">
-                When I'm not coding, you can find me exploring new technologies,
-                contributing to open-source projects, or sharing knowledge with
-                the developer community through blog posts and mentoring.
-              </p>
+              {content?.bio ? (
+                content.bio.split('\n').map((paragraph, i) => (
+                  <p key={i} data-testid={`text-about-description-${i+1}`}>
+                    {paragraph}
+                  </p>
+                ))
+              ) : (
+                <>
+                  <p data-testid="text-about-description-1">
+                    I'm a passionate Full Stack Developer with over 5 years of
+                    experience building modern web applications. I specialize in
+                    creating seamless user experiences with React and building
+                    robust backend systems with Node.js and Python.
+                  </p>
+                  <p data-testid="text-about-description-2">
+                    My journey in software development started with a curiosity
+                    about how things work on the web. Today, I'm dedicated to
+                    writing clean, maintainable code and continuously learning new
+                    technologies to stay at the forefront of web development.
+                  </p>
+                </>
+              )}
             </div>
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-16"
-        >
-          <h3
-            className="text-2xl font-semibold mb-8 text-center"
-            data-testid="text-skills-title"
-          >
-            Skills & Technologies
-          </h3>
+        {skills.length > 0 && (
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
-            data-testid="grid-skills"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-16"
           >
-            {skills.map((skill, index) => (
-              <SkillCard key={skill.name} name={skill.name} icon={skill.icon} index={index} />
-            ))}
+            <h3
+              className="text-2xl font-semibold mb-8 text-center"
+              data-testid="text-skills-title"
+            >
+              Skills & Technologies
+            </h3>
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+              data-testid="grid-skills"
+            >
+              {skills.map((skill, index) => (
+                <SkillCard key={skill.id} name={skill.name} iconName={skill.icon} index={index} />
+              ))}
+            </motion.div>
           </motion.div>
-        </motion.div>
+        )}
       </div>
     </section>
   );
