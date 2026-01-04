@@ -541,7 +541,6 @@ function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => vo
   );
 }
 
-
 export default function AdminPage() {
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem("adminToken");
