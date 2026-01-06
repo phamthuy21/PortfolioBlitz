@@ -591,12 +591,14 @@ function BlogTab({ token }: { token: string }) {
 }
 
 function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => void }) {
+  const [activeTab, setActiveTab] = useState("messages");
+
   return (
     <div className="min-h-screen bg-background relative selection:bg-primary selection:text-primary-foreground">
       <AdminNavbar token={token} onLogout={onLogout} />
 
       <main className="max-w-6xl mx-auto px-4 py-12">
-        <Tabs defaultValue="messages" className="space-y-10">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-10">
           <div className="flex items-center justify-center sm:justify-start">
             <TabsList className="h-14 p-1.5 bg-muted/50 backdrop-blur border border-primary/5 rounded-2xl shadow-sm" data-testid="tabs-admin">
               <TabsTrigger value="messages" className="h-11 px-6 rounded-xl data-[state=active]:shadow-lg" data-testid="tab-messages">
@@ -619,21 +621,29 @@ function AdminDashboard({ token, onLogout }: { token: string; onLogout: () => vo
           </div>
 
           <AnimatePresence mode="wait">
-            <TabsContent value="messages">
-              <MessagesTab token={token} />
-            </TabsContent>
+            {activeTab === "messages" && (
+              <TabsContent value="messages" key="messages-content" forceMount>
+                <MessagesTab token={token} />
+              </TabsContent>
+            )}
 
-            <TabsContent value="content">
-              <ContentTab token={token} />
-            </TabsContent>
+            {activeTab === "content" && (
+              <TabsContent value="content" key="content-content" forceMount>
+                <ContentTab token={token} />
+              </TabsContent>
+            )}
 
-            <TabsContent value="blog">
-              <BlogTab token={token} />
-            </TabsContent>
+            {activeTab === "blog" && (
+              <TabsContent value="blog" key="blog-content" forceMount>
+                <BlogTab token={token} />
+              </TabsContent>
+            )}
 
-            <TabsContent value="analytics">
-              <AnalyticsTab token={token} />
-            </TabsContent>
+            {activeTab === "analytics" && (
+              <TabsContent value="analytics" key="analytics-content" forceMount>
+                <AnalyticsTab token={token} />
+              </TabsContent>
+            )}
           </AnimatePresence>
         </Tabs>
       </main>
