@@ -575,7 +575,7 @@ function BlogTab({ token }: { token: string }) {
                       ))}
                     </div>
                     <Link href={`/blog/${post.slug}`}>
-                      <Button variant="link" className="h-auto p-0 text-xs font-bold text-primary flex items-center group/link">
+                      <Button variant="ghost" className="h-auto p-0 text-xs font-bold text-primary flex items-center group/link hover:bg-transparent">
                         View Live <ExternalLink className="ml-1 h-3 w-3 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
                       </Button>
                     </Link>
