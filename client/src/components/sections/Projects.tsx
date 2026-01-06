@@ -123,6 +123,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 export function Projects() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [selectedCategory, setSelectedCategory] = useState<ProjectCategory>("all");
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
 
   const { data: projectsData } = useQuery<{ success: boolean; data: Project[] }>({
@@ -139,10 +140,15 @@ export function Projects() {
 
   const filteredProjects = useMemo(() => {
     return projectsList.filter((project) => {
+      const categoryMatch = selectedCategory === "all" || project.category === selectedCategory;
       const techMatch = !selectedTech || project.techStack?.includes(selectedTech);
-      return techMatch;
+      return categoryMatch && techMatch;
     });
-  }, [projectsList, selectedTech]);
+  }, [projectsList, selectedCategory, selectedTech]);
+
+  const handleCategoryChange = (category: ProjectCategory) => {
+    setSelectedCategory(category);
+  };
 
   const handleTechChange = (tech: string | null) => {
     setSelectedTech(tech);
@@ -173,8 +179,25 @@ export function Projects() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-10 space-y-4"
+          className="mb-10 space-y-6"
         >
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-2" data-testid="filter-categories">
+            {categories.map((cat) => (
+              <Button
+                key={cat.value}
+                variant={selectedCategory === cat.value ? "default" : "outline"}
+                size="sm"
+                className="rounded-full transition-all duration-200"
+                onClick={() => handleCategoryChange(cat.value)}
+                data-testid={`button-filter-category-${cat.value}`}
+              >
+                {cat.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Tech Filter */}
           <div className="flex flex-wrap justify-center gap-2" data-testid="filter-tech-stack">
             <Badge
               variant={selectedTech === null ? "default" : "outline"}
